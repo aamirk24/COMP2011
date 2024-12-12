@@ -3,18 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 import requests
-from flask_apscheduler import APScheduler
-from sqlalchemy.dialects.sqlite import insert
-import os
 
 db = SQLAlchemy()
 migrate = Migrate()
-# scheduler = APScheduler()
 DB_NAME = "app.db"
 
 EXERCISE_DB_API_URL = "https://exercisedb.p.rapidapi.com/exercises"
 API_KEY = "03b7d82e16mshab008f6186e501bp1d7bc7jsn23666f9bad67"
-# API_KEY = "dummy"
 
 
 def get_exercises(limit, offset):
@@ -42,13 +37,6 @@ def create_app():
     app.config['SECRET_KEY'] = 'your-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # app.config['SCHEDULER_API_ENABLED'] = True
-    # app.config['SCHEDULER_EXECUTORS'] = {
-    #     'default': {
-    #         'type': 'threadpool',
-    #         'max_workers': 1
-    #     }
-    # }
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -64,24 +52,6 @@ def create_app():
     with app.app_context():
         db.create_all()
         sync_data(app, Exercise)
-
-        # if 'PYTHONANYWHERE' in os.environ:
-        #     # If on PythonAnywhere, don't start scheduler in app
-        #     app.config['SCHEDULER_AUTOSTART'] = False
-
-        # else:
-        #     scheduler.init_app(app)
-        #
-        #     scheduler.add_job(
-        #         id='daily_exercise_sync',
-        #         func=sync_data,
-        #         trigger='cron',
-        #         hour=18,
-        #         max_instances=1,
-        #         args=[app, Exercise]
-        #     )
-        #
-        #     scheduler.start()
 
     login_manager = LoginManager()
     login_manager.login_view = 'views.landing'
