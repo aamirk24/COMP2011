@@ -5,6 +5,7 @@ from flask_login import LoginManager
 import requests
 from flask_apscheduler import APScheduler
 from sqlalchemy.dialects.sqlite import insert
+import os
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -65,6 +66,10 @@ def create_app():
         db.create_all()
         sync_data(app, Exercise)
 
+        if 'PYTHONANYWHERE' in os.environ:
+            # If on PythonAnywhere, don't start scheduler in app
+            app.config['SCHEDULER_AUTOSTART'] = False
+
         scheduler.add_job(
             id='daily_exercise_sync',
             func=sync_data,
@@ -74,7 +79,7 @@ def create_app():
             args=[app, Exercise]
         )
 
-    scheduler.start()
+        scheduler.start()
 
     login_manager = LoginManager()
     login_manager.login_view = 'views.landing'
