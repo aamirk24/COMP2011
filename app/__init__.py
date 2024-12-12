@@ -9,7 +9,7 @@ import os
 
 db = SQLAlchemy()
 migrate = Migrate()
-scheduler = APScheduler()
+# scheduler = APScheduler()
 DB_NAME = "app.db"
 
 EXERCISE_DB_API_URL = "https://exercisedb.p.rapidapi.com/exercises"
@@ -42,13 +42,13 @@ def create_app():
     app.config['SECRET_KEY'] = 'your-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SCHEDULER_API_ENABLED'] = True
-    app.config['SCHEDULER_EXECUTORS'] = {
-        'default': {
-            'type': 'threadpool',
-            'max_workers': 1
-        }
-    }
+    # app.config['SCHEDULER_API_ENABLED'] = True
+    # app.config['SCHEDULER_EXECUTORS'] = {
+    #     'default': {
+    #         'type': 'threadpool',
+    #         'max_workers': 1
+    #     }
+    # }
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -65,23 +65,23 @@ def create_app():
         db.create_all()
         sync_data(app, Exercise)
 
-        if 'PYTHONANYWHERE' in os.environ:
-            # If on PythonAnywhere, don't start scheduler in app
-            app.config['SCHEDULER_AUTOSTART'] = False
+        # if 'PYTHONANYWHERE' in os.environ:
+        #     # If on PythonAnywhere, don't start scheduler in app
+        #     app.config['SCHEDULER_AUTOSTART'] = False
 
-        else:
-            scheduler.init_app(app)
-
-            scheduler.add_job(
-                id='daily_exercise_sync',
-                func=sync_data,
-                trigger='cron',
-                hour=18,
-                max_instances=1,
-                args=[app, Exercise]
-            )
-
-            scheduler.start()
+        # else:
+        #     scheduler.init_app(app)
+        #
+        #     scheduler.add_job(
+        #         id='daily_exercise_sync',
+        #         func=sync_data,
+        #         trigger='cron',
+        #         hour=18,
+        #         max_instances=1,
+        #         args=[app, Exercise]
+        #     )
+        #
+        #     scheduler.start()
 
     login_manager = LoginManager()
     login_manager.login_view = 'views.landing'
