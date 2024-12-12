@@ -42,11 +42,16 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SCHEDULER_API_ENABLED'] = True
+    app.config['SCHEDULER_EXECUTORS'] = {
+        'default': {
+            'type': 'threadpool',
+            'max_workers': 1
+        }
+    }
 
     db.init_app(app)
     migrate.init_app(app, db)
     scheduler.init_app(app)
-    scheduler.start()
 
     from .views import views
     from .auth import auth
@@ -65,8 +70,11 @@ def create_app():
             func=sync_data,
             trigger='cron',
             hour=18,
+            max_instances=1,
             args=[app, Exercise]
         )
+
+    scheduler.start()
 
     login_manager = LoginManager()
     login_manager.login_view = 'views.landing'
