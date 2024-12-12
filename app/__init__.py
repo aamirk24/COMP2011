@@ -52,7 +52,6 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
-    scheduler.init_app(app)
 
     from .views import views
     from .auth import auth
@@ -70,16 +69,19 @@ def create_app():
             # If on PythonAnywhere, don't start scheduler in app
             app.config['SCHEDULER_AUTOSTART'] = False
 
-        scheduler.add_job(
-            id='daily_exercise_sync',
-            func=sync_data,
-            trigger='cron',
-            hour=18,
-            max_instances=1,
-            args=[app, Exercise]
-        )
+        else:
+            scheduler.init_app(app)
 
-        scheduler.start()
+            scheduler.add_job(
+                id='daily_exercise_sync',
+                func=sync_data,
+                trigger='cron',
+                hour=18,
+                max_instances=1,
+                args=[app, Exercise]
+            )
+
+            scheduler.start()
 
     login_manager = LoginManager()
     login_manager.login_view = 'views.landing'
