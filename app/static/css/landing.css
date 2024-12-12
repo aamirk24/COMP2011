@@ -91,3 +91,29 @@
     border-color: #ffffff;
     color: #000000;
 }
+
+/* for smaller screens */
+@media (max-width: 768px) {
+    .heading-title {
+        font-size: 3rem;
+        margin-bottom: -10px;
+    }
+
+    .hero-section {
+        min-height: 80vh;
+    }
+
+    .hero-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stats-number {
+        font-size: 1.75rem;
+    }
+
+    .heading {
+        margin-bottom: -10px;
+    }
+}
